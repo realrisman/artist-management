@@ -2,9 +2,9 @@
 
 namespace App\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -12,20 +12,20 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 class User implements UserInterface, \Serializable
 {
+
     const ROLE_ADMIN = 'ROLE_ADMIN';
     const ROLE_EDITOR = 'ROLE_EDITOR';
-
+    const ROLE_SPECTATOR = 'ROLE_SPECTATOR';
+    const ROLE_SPOT_CHECKER = 'ROLE_SPOT_CHECKER';
+    const ROLE_WRITER = 'ROLE_WRITER';
+    const ROLE_TRAINER = 'ROLE_TRAINER';
+    const ROLE_IMAGE_UPLOADER = 'ROLE_IMAGE_UPLOADER';
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      */
     private $id;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $username;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -38,16 +38,6 @@ class User implements UserInterface, \Serializable
     private $role;
 
     /**
-     * @ORM\Column(type="smallint")
-     */
-    private $active;
-
-    /**
-     * @ORM\Column(type="boolean")
-     */
-    private $deleted = false;
-
-    /**
      * @ORM\OneToMany(targetEntity="Representative", mappedBy="user")
      */
     private $agents;
@@ -56,11 +46,35 @@ class User implements UserInterface, \Serializable
      * @ORM\OneToMany(targetEntity="App\Entity\Celebrity", mappedBy="user")
      */
     private $celebrities;
-
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Company", mappedBy="user")
      */
     private $companies;
+
+    /**
+     * @ORM\Column(type="smallint")
+     */
+    private $active;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $login;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $first_name;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $last_name;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $deleted = false;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\RepresentativeLog", mappedBy="user")
@@ -71,11 +85,20 @@ class User implements UserInterface, \Serializable
      * @ORM\OneToMany(targetEntity="App\Entity\CelebrityLog", mappedBy="user")
      */
     private $celebrityLogs;
-
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\CompanyLog", mappedBy="user")
      */
     private $companyLogs;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $monthlyLimit;
+
+    /**
+     * @ORM\Column(type="integer", nullable=true)
+     */
+    private $limitUsed;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\UniqueLink", mappedBy="user")
@@ -92,26 +115,25 @@ class User implements UserInterface, \Serializable
      */
     private $uniqueLinkCompanies;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $email_sync;
+
     public function __construct()
     {
-        $this->celebrities = new ArrayCollection();
+        $this->agents             = new ArrayCollection();
+        $this->celebrities        = new ArrayCollection();
+        $this->representativeLogs = new ArrayCollection();
+        $this->celebrityLogs      = new ArrayCollection();
+        $this->uniqueLinks = new ArrayCollection();
+        $this->uniqueLinkCelebrities = new ArrayCollection();
+        $this->uniqueLinkCompanies = new ArrayCollection();
     }
 
     public function getId()
     {
         return $this->id;
-    }
-
-    public function setUsername(string $username): self
-    {
-        $this->username = $username;
-
-        return $this;
-    }
-
-    public function getUsername()
-    {
-        return $this->username;
     }
 
     public function getPassword(): ?string
@@ -219,7 +241,12 @@ class User implements UserInterface, \Serializable
     {
         return [
             self::ROLE_ADMIN,
+            self::ROLE_SPOT_CHECKER,
             self::ROLE_EDITOR,
+            self::ROLE_SPECTATOR,
+            self::ROLE_TRAINER,
+            self::ROLE_WRITER,
+            self::ROLE_IMAGE_UPLOADER
         ];
     }
 
@@ -244,38 +271,6 @@ class User implements UserInterface, \Serializable
         return [$this->role];
     }
 
-    /** @see \Serializable::serialize() */
-    public function serialize()
-    {
-        return serialize(array(
-            $this->id,
-            $this->username,
-            $this->password,
-        ));
-    }
-
-    /** @see \Serializable::unserialize() */
-    public function unserialize($serialized)
-    {
-        list(
-            $this->id,
-            $this->login,
-            $this->password,
-        ) = unserialize($serialized, ['allowed_classes' => false]);
-    }
-
-    public function getDeleted(): ?bool
-    {
-        return $this->deleted;
-    }
-
-    public function setDeleted(bool $deleted): self
-    {
-        $this->deleted = $deleted;
-
-        return $this;
-    }
-
     /**
      * Returns the salt that was originally used to encode the password.
      *
@@ -289,6 +284,16 @@ class User implements UserInterface, \Serializable
     }
 
     /**
+     * Returns the username used to authenticate the user.
+     *
+     * @return string The username
+     */
+    public function getUsername()
+    {
+        return $this->login;
+    }
+
+    /**
      * Removes sensitive data from the user.
      *
      * This is important if, at any given point, sensitive information like
@@ -297,6 +302,78 @@ class User implements UserInterface, \Serializable
     public function eraseCredentials()
     {
         // TODO: Implement eraseCredentials() method.
+    }
+
+    public function getLogin(): ?string
+    {
+        return $this->login;
+    }
+
+    public function setLogin(string $login): self
+    {
+        $this->login = $login;
+
+        return $this;
+    }
+
+    /** @see \Serializable::serialize() */
+    public function serialize()
+    {
+        return serialize(array(
+            $this->id,
+            $this->login,
+            $this->password,
+            // see section on salt below
+            // $this->salt,
+        ));
+    }
+
+    /** @see \Serializable::unserialize() */
+    public function unserialize($serialized)
+    {
+        list(
+            $this->id,
+            $this->login,
+            $this->password,
+            // see section on salt below
+            // $this->salt
+        ) = unserialize($serialized, ['allowed_classes' => false]);
+    }
+
+    public function getFirstName(): ?string
+    {
+        return $this->first_name;
+    }
+
+    public function setFirstName(?string $first_name): self
+    {
+        $this->first_name = $first_name;
+
+        return $this;
+    }
+
+    public function getLastName(): ?string
+    {
+        return $this->last_name;
+    }
+
+    public function setLastName(?string $last_name): self
+    {
+        $this->last_name = $last_name;
+
+        return $this;
+    }
+
+    public function getDeleted(): ?bool
+    {
+        return $this->deleted;
+    }
+
+    public function setDeleted(bool $deleted): self
+    {
+        $this->deleted = $deleted;
+
+        return $this;
     }
 
     /**
@@ -359,6 +436,35 @@ class User implements UserInterface, \Serializable
         }
 
         return $this;
+    }
+
+    public function getMonthlyLimit(): ?int
+    {
+        return $this->monthlyLimit;
+    }
+
+    public function setMonthlyLimit(?int $monthlyLimit): self
+    {
+        $this->monthlyLimit = $monthlyLimit;
+
+        return $this;
+    }
+
+    public function getLimitUsed(): ?int
+    {
+        return $this->limitUsed;
+    }
+
+    public function setLimitUsed(?int $limitUsed): self
+    {
+        $this->limitUsed = $limitUsed;
+
+        return $this;
+    }
+
+    public function __toString()
+    {
+        return $this->getLogin();
     }
 
     /**
@@ -484,5 +590,21 @@ class User implements UserInterface, \Serializable
         }
 
         return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getEmailSync()
+    {
+        return $this->email_sync;
+    }
+
+    /**
+     * @param mixed $email_sync
+     */
+    public function setEmailSync($email_sync): void
+    {
+        $this->email_sync = $email_sync;
     }
 }
