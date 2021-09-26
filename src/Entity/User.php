@@ -47,11 +47,6 @@ class User implements UserInterface, \Serializable
      */
     private $deleted = false;
 
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Celebrity", mappedBy="user")
-     */
-    private $celebrities;
-
     public function __construct()
     {
         $this->celebrities = new ArrayCollection();
@@ -195,36 +190,5 @@ class User implements UserInterface, \Serializable
     public function eraseCredentials()
     {
         // TODO: Implement eraseCredentials() method.
-    }
-
-    /**
-     * @return Collection|Celebrity[]
-     */
-    public function getCelebrities(): Collection
-    {
-        return $this->celebrities;
-    }
-
-    public function addCelebrity(Celebrity $celebrity): self
-    {
-        if (!$this->celebrities->contains($celebrity)) {
-            $this->celebrities[] = $celebrity;
-            $celebrity->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeCelebrity(Celebrity $celebrity): self
-    {
-        if ($this->celebrities->contains($celebrity)) {
-            $this->celebrities->removeElement($celebrity);
-            // set the owning side to null (unless already changed)
-            if ($celebrity->getUser() === $this) {
-                $celebrity->setUser(null);
-            }
-        }
-
-        return $this;
     }
 }
