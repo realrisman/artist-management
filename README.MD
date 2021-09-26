@@ -46,7 +46,7 @@ First, [install Docker Desktop](https://www.docker.com/products/docker-desktop),
 
 Next, [install Docker Compose](https://docs.docker.com/compose/install/). If you're on Windows or Mac you can skip this step because Docker Desktop includes Compose along with other Docker apps.
 
-Make sure you have created `.env` (see `.env.dist` for reference) and modified credentials.
+Make sure you have created `.env` (see `.env.sample` for reference) and modified credentials.
 
 Then run the following command inside the project directory to build containers
 
