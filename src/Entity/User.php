@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -44,6 +46,16 @@ class User implements UserInterface, \Serializable
      * @ORM\Column(type="boolean")
      */
     private $deleted = false;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Celebrity", mappedBy="user")
+     */
+    private $celebrities;
+
+    public function __construct()
+    {
+        $this->celebrities = new ArrayCollection();
+    }
 
     public function getId()
     {
@@ -169,7 +181,8 @@ class User implements UserInterface, \Serializable
      *
      * @return string|null The salt
      */
-    public function getSalt(){
+    public function getSalt()
+    {
         return null;
     }
 
@@ -179,7 +192,39 @@ class User implements UserInterface, \Serializable
      * This is important if, at any given point, sensitive information like
      * the plain-text password is stored on this object.
      */
-    public function eraseCredentials(){
+    public function eraseCredentials()
+    {
         // TODO: Implement eraseCredentials() method.
+    }
+
+    /**
+     * @return Collection|Celebrity[]
+     */
+    public function getCelebrities(): Collection
+    {
+        return $this->celebrities;
+    }
+
+    public function addCelebrity(Celebrity $celebrity): self
+    {
+        if (!$this->celebrities->contains($celebrity)) {
+            $this->celebrities[] = $celebrity;
+            $celebrity->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCelebrity(Celebrity $celebrity): self
+    {
+        if ($this->celebrities->contains($celebrity)) {
+            $this->celebrities->removeElement($celebrity);
+            // set the owning side to null (unless already changed)
+            if ($celebrity->getUser() === $this) {
+                $celebrity->setUser(null);
+            }
+        }
+
+        return $this;
     }
 }
