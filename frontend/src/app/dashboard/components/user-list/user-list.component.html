@@ -1,0 +1,9 @@
+<a mat-raised-button routerLink="/users/add">Add User</a><br><br>
+<ag-grid-angular
+        class="ag-theme-balham user-list"
+        [rowData]="users"
+        [gridOptions]="gridOptions"
+        [columnDefs]="columnDefs"
+        (rowClicked)="onRowClicked($event)"
+>
+</ag-grid-angular>

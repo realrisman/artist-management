@@ -1,0 +1,21 @@
+<h1 mat-dialog-title>Export settings</h1>
+<mat-dialog-content>
+
+</mat-dialog-content>
+<mat-dialog-actions>
+        <mat-form-field>
+            <input matInput placeholder="Number of records to export" [(ngModel)]="settings.total">
+        </mat-form-field>
+        <mat-form-field>
+            <input matInput placeholder="Start from" [(ngModel)]="settings.from">
+        </mat-form-field>
+
+        <button mat-raised-button (click)="doExport()"
+            class="pull-right" cdkFocusInitial>
+        Export
+    </button>
+    <button mat-raised-button
+            class="pull-right"[mat-dialog-close]="true">
+        Cancel
+    </button>
+</mat-dialog-actions>

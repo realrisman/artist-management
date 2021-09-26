@@ -1,0 +1,67 @@
+<div fxFlex="row">
+    <mat-form-field fxFlex="15">
+        <input matInput type="text" name="search" [(ngModel)]="filter.search" (change)="onFilterChange()"
+               placeholder="Search term">
+    </mat-form-field>
+
+    <mat-form-field fxFlex="15">
+        <mat-select [(value)]="filter.field" placeholder="Search by" (change)="onFilterChange()">
+            <mat-option value="name">Name</mat-option>
+            <mat-option value="user">User</mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <mat-form-field fxFlex="15">
+        <mat-select [(value)]="filter.user" placeholder="User" (change)="onFilterChange()">
+            <mat-option *ngFor="let user of users" [value]="user.id">{{user.login}}</mat-option>
+        </mat-select>
+    </mat-form-field>
+    <mat-form-field fxFlex="20">
+        <input [matDatepicker]="myDatepickerFrom" matInput placeholder="From" value=""
+               [(ngModel)]="filter.from" name="from" (dateChange)="onFilterChange()">
+        <mat-datepicker-toggle matSuffix [for]="myDatepickerFrom"></mat-datepicker-toggle>
+        <mat-datepicker #myDatepickerFrom></mat-datepicker>
+    </mat-form-field>
+    <mat-form-field fxFlex="20">
+        <input [matDatepicker]="myDatepickerTo" matInput placeholder="To" value=""
+               [(ngModel)]="filter.to" name="date" (dateChange)="onFilterChange()">
+        <mat-datepicker-toggle matSuffix [for]="myDatepickerTo"></mat-datepicker-toggle>
+        <mat-datepicker #myDatepickerTo></mat-datepicker>
+    </mat-form-field>
+    <mat-form-field fxFlex="7">
+        <mat-select [(value)]="filter.order" placeholder="Order" (change)="onFilterChange()">
+            <mat-option value="asc">Asc</mat-option>
+            <mat-option value="desc">Desc</mat-option>
+        </mat-select>
+    </mat-form-field>
+</div>
+<div style="min-height: 20px;width:100%" [hidden]="!loading">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+</div>
+<div>
+    <mat-tab-group (selectedTabChange)="tabSwitch($event)">
+        <mat-tab label="Celebrities">
+            <div *ngFor="let celebrity of celebrities;last as isLast;index as i">
+                <celebrity-verbose-log [new]="celebrity.new" [old]="celebrity.old"
+                                       [name]="celebrity.new.name"></celebrity-verbose-log>
+            </div>
+        </mat-tab>
+        <mat-tab label="Representatives">
+            <div *ngFor="let representative of representatives;last as isLast;index as i">
+                <representative-verbose-log [new]="representative.new" [name]="representative.new.name"
+                                            [old]="representative.old"></representative-verbose-log>
+            </div>
+        </mat-tab>
+        <mat-tab label="Companies">
+            <div *ngFor="let company of companies;last as isLast;index as i">
+                <company-verbose-log [new]="company.new" [name]="company.new.name"
+                                            [old]="company.old"></company-verbose-log>
+            </div>
+        </mat-tab>
+    </mat-tab-group>
+</div>
+<div>
+    <mat-paginator [length]="total" [pageSize]="filter.limit" (page)="processPageEvent($event)"
+                   showFirstLastButtons="true">
+    </mat-paginator>
+</div>

@@ -1,0 +1,24 @@
+a.primary-category-link {
+    float: right;
+    font-size: smaller;
+    width: 80px;
+}
+
+a.primary-category-link span {
+    float: right;
+}
+
+a.primary-category-link span::before {
+    content: 'make primary';
+}
+
+span.primary-category-label {
+    color: rgba(0, 0, 0, .54);
+}
+
+div.primary-category {
+    font-family: Roboto, "Helvetica Neue", sans-serif
+}
+mat-option.shifted{
+    padding-left: 30px;
+}

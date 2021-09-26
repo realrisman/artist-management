@@ -1,0 +1,88 @@
+<div style="margin-bottom: 10px;" fxLayout="row" fxLayoutGap="10px">
+    <div style="width: 70px">
+        <a mat-icon-button [routerLink]="['/users']">
+            <mat-icon>keyboard_backspace</mat-icon>
+            Back</a>
+    </div>
+</div>
+<h2 *ngIf="user.id">Edit user</h2>
+<h2 *ngIf="!user.id">Add user</h2>
+<div style="min-height: 20px;width:100%" *ngIf="isSaving">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+</div>
+<form class="form" #saveForm="ngForm" (ngSubmit)="onSubmit($event)" name="user-form-data"
+      RepeatPassword="password,password2"
+      fxLayout="column">
+    <div style="width: 50%">
+        <mat-form-field>
+            <input matInput placeholder="Login" value="" type="text" [(ngModel)]="user.login" name="login"
+                   [disabled]="isSaving">
+        </mat-form-field>
+    </div>
+    <div>
+        <mat-form-field>
+            <input matInput placeholder="First name" value="" type="text" [(ngModel)]="user.first_name"
+                   name="first_name"
+                   [disabled]="isSaving">
+        </mat-form-field>
+    </div>
+    <div>
+        <mat-form-field>
+            <input matInput placeholder="Last name" value="" type="text" [(ngModel)]="user.last_name" name="last_name"
+                   [disabled]="isSaving">
+        </mat-form-field>
+    </div>
+    <div>
+        <mat-form-field>
+            <input matInput placeholder="Monthly export limit" value="" type="text" [(ngModel)]="user.monthly_limit" name="monthly_limit"
+                   [disabled]="isSaving">
+        </mat-form-field>
+    </div>
+    <div>
+        <mat-form-field>
+            <input matInput placeholder="Monthly limit used" value="" type="text" [(ngModel)]="user.limit_used" name="limit_used"
+                   [disabled]="isSaving">
+        </mat-form-field>
+    </div>
+    <div>
+        <mat-form-field>
+            <mat-select [(value)]="user.role" placeholder="Role" [disabled]="isSaving">
+                <mat-option *ngFor="let role of roles" [value]="role.role">{{role.title}}</mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+    <div>
+        <mat-radio-group [(ngModel)]="user.deleted" name="deleted">
+            <mat-radio-button [value]="false">Active</mat-radio-button>
+            <mat-radio-button [value]="true">Deleted</mat-radio-button>
+        </mat-radio-group>
+    </div>
+    <div>
+        <mat-form-field>
+            <input matInput placeholder="Password" value="" type="password" [(ngModel)]="user.password"
+                   name="password" [disabled]="isSaving" [required]="!user.id">
+        </mat-form-field>
+    </div>
+    <div>
+        <mat-form-field>
+            <input matInput placeholder="Repeat password" value="" type="password" [(ngModel)]="user.password2"
+                   [disabled]="isSaving" [required]="!user.id"
+                   name="password2">
+        </mat-form-field>
+    </div>
+    <div style="min-height: 20px">
+        <div class="mat-error" *ngIf="saveForm.errors?.RepeatPassword">
+            Passwords do not match
+        </div>
+        <div class="mat-error" *ngFor="let error_text of errors">
+            {{error_text}}
+        </div>
+    </div>
+    <div class="button-group" style="padding-left:170px">
+        <a mat-raised-button routerLink="/users">Cancel</a>
+        <button mat-raised-button="" [disabled]="!saveForm.form.valid || isSaving" type="submit"
+                color="primary">
+            Save
+        </button>
+    </div>
+</form>

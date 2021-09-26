@@ -1,0 +1,10 @@
+mat-card {
+    margin-bottom: 10px;
+}
+.quick-view-actions button{
+    padding-left: 8px;
+    padding-right: 8px;
+}
+.quick-view-actions .mat-raised-button{
+    min-width: 84px;
+}

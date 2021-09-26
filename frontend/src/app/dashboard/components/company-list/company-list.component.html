@@ -1,0 +1,49 @@
+<div fxFlex="row" fxLayoutGap="10px">
+    <a mat-raised-button routerLink="/companies/add" allowed="ROLE_ADMIN,ROLE_EDITOR,ROLE_SPOT_CHECKER,ROLE_USER,ROLE_TRAINER">Add Company</a>
+    <mat-form-field fxFlex="18">
+        <input matInput placeholder="Name" value="" type="text" name="name" [(ngModel)]="filter.name"
+               (change)="onFilterChange()">
+    </mat-form-field>
+    <mat-form-field fxFlex="8">
+        <mat-select [(value)]="filter.status" placeholder="Status" (change)="onFilterChange()">
+            <mat-option value="draft">Draft</mat-option>
+            <mat-option value="qa">QA</mat-option>
+            <mat-option value="ready">Ready for review</mat-option>
+            <mat-option value="live">Live</mat-option>
+            <mat-option value="deleted">Deleted</mat-option>
+        </mat-select>
+    </mat-form-field>
+    <mat-form-field fxFlex="15">
+        <mat-select [(value)]="filter.sort" placeholder="Sort" (change)="onFilterChange()">
+            <mat-option value="added">Recently added</mat-option>
+            <mat-option value="modified">Recently modified</mat-option>
+            <mat-option value="name">Alphabetical</mat-option>
+            <mat-option value="status">Status</mat-option>
+            <mat-option value="company">Verification Rank</mat-option>
+        </mat-select>
+    </mat-form-field>
+    <mat-form-field fxFlex="7">
+        <mat-select [(value)]="filter.order" placeholder="Order" (change)="onFilterChange()">
+            <mat-option value="asc">Asc</mat-option>
+            <mat-option value="desc">Desc</mat-option>
+        </mat-select>
+    </mat-form-field>
+</div>
+
+<div style="min-height: 20px;width:100%" [hidden]="!loading">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+</div>
+<div>
+    <ag-grid-angular
+        class="ag-theme-balham representative-list"
+        [rowData]="companies"
+        [gridOptions]="gridOptions"
+        [columnDefs]="columnDefs"
+    >
+    </ag-grid-angular>
+</div>
+<div>
+    <mat-paginator [length]="total" [pageSize]="filter.limit" (page)="processPageEvent($event)"
+                   showFirstLastButtons="true" [pageSizeOptions]="pageSizeOptions">
+    </mat-paginator>
+</div>

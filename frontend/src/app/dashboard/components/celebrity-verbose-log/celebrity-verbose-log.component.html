@@ -1,0 +1,118 @@
+<mat-card fxFlexAlign="column">
+    <mat-card-content>
+        <mat-card-title>
+            {{new.user}}
+            on {{new.valid_from|date:'short'}} <span *ngIf="name"> for <b>{{name}}</b></span>
+        </mat-card-title>
+        <mat-list>
+            <mat-list-item *ngIf="old?.last_verify_date != new?.last_verify_date">
+                <div matLine><b>Profile verified</b></div>
+                <div matLine *ngIf="old?.bio != new?.bio"><br></div>
+                <div matLine *ngIf="old?.bio != new?.bio"><br></div>
+            </mat-list-item>
+            <!--@TODO handle price and deceased fields-->
+            <mat-list-item *ngIf="notModified">Saved without any modifications</mat-list-item>
+            <mat-list-item *ngIf="old?.name != new?.name">
+                Name changed from {{old?.name}} to {{new?.name}}
+            </mat-list-item>
+
+            <mat-list-item *ngIf="old?.spot_checked != new?.spot_checked">
+                Spot checked
+            </mat-list-item>
+
+            <mat-list-item *ngIf="old?.image != new?.image">
+                Image changed from {{old?.image}} to <a href="{{new?.image}}" target="_blank">{{new?.image}}</a>
+            </mat-list-item>
+            <mat-list-item *ngIf="old?.image_title != new?.image_title">
+                Image changed from {{old?.image_title}} to {{new?.image_title}}
+            </mat-list-item>
+            <mat-list-item *ngIf="old?.image_alt != new?.image_alt">
+                Image alt from {{old?.image_alt}} to {{new?.image_alt}}
+            </mat-list-item>
+            <mat-list-item *ngIf="old?.birthdate != new?.birthdate">
+                Birthday changed to {{new?.birthdate}}
+            </mat-list-item>
+            <mat-list-item *ngIf="old?.country != new?.country">
+                Country changed to {{new?.country}}
+            </mat-list-item>
+            <mat-list-item *ngIf="old?.city != new?.city">
+                City changed to {{new?.city}}
+            </mat-list-item>
+            <mat-list-item *ngIf="old?.state != new?.state">
+                State changed to {{new?.state}}
+            </mat-list-item>
+            <mat-list-item *ngIf="old?.price != new?.price">
+                Price changed to {{new?.price}}
+            </mat-list-item>
+            <mat-list-item *ngIf="old?.profession != new?.profession">
+                Profession changed to {{new?.profession}}
+            </mat-list-item>
+            <mat-list-item *ngIf="old?.instagram != new?.instagram">
+                Instagram changed to {{new?.instagram}}
+            </mat-list-item>
+            <mat-list-item *ngIf="old?.youtube != new?.youtube">
+                Youtube changed to {{new?.youtube}}
+            </mat-list-item>
+            <mat-list-item *ngIf="old?.deceased != new?.deceased">
+                Deceased changed to {{new?.deceased}}
+            </mat-list-item>
+            <mat-list-item *ngIf="old?.hiatus != new?.hiatus">
+                Hiatus changed to {{new?.hiatus}}
+            </mat-list-item>
+            <mat-list-item *ngIf="old?.selfManaged != new?.selfManaged">
+                Self managed to {{new?.selfManaged}}
+            </mat-list-item>
+            <mat-list-item *ngIf="old?.status != new?.status">
+                Status changed to {{new?.status}}
+            </mat-list-item>
+            <mat-list-item *ngIf="old?.youtube != new?.youtube">
+                Youtube changed to {{new?.youtube}}
+            </mat-list-item>
+            <mat-list-item *ngIf="old?.directAddress != new?.directAddress">
+                Direct address changed to {{new?.directAddress}}
+            </mat-list-item>
+            <mat-list-item *ngIf="newCats.length">
+                Added categories:
+                <span *ngFor="let cat of newCats;last as isLast">{{cat.name}}<span *ngIf="!isLast">,</span> </span>
+            </mat-list-item>
+            <mat-list-item *ngIf="removedCats.length">
+                Removed categories:
+                <span *ngFor="let cat of removedCats;last as isLast">{{cat.name}}<span *ngIf="!isLast">,</span> </span>
+            </mat-list-item>
+            <mat-list-item *ngIf="newLinks.length">
+                Added links:
+                <span *ngFor="let link of newLinks;last as isLast">{{link.type|titlecase}} {{link.url}}<span *ngIf="!isLast">,</span> </span>
+            </mat-list-item>
+            <mat-list-item *ngIf="removedLinks.length">
+                Removed links:
+                <span *ngFor="let link of removedLinks;last as isLast">{{link.type|titlecase}} {{link.url}}<span *ngIf="!isLast">,</span> </span>
+            </mat-list-item>
+            <mat-list-item *ngIf="newReps.length">
+                Added representatives:
+                <span *ngFor="let rep of newReps;last as isLast">{{rep.representative?.name}}{{rep.company?.name}}<span
+                        *ngIf="!isLast">,</span> </span>
+            </mat-list-item>
+            <mat-list-item *ngIf="removedReps.length">
+                Removed representatives:
+                <span *ngFor="let rep of removedReps;last as isLast">{{rep.representative?.name}}{{rep.company?.name}}<span
+                        *ngIf="!isLast">,</span> </span>
+            </mat-list-item>
+            <mat-list-item *ngIf="changedReps.length">
+                <p matLine>Changed representatives:</p>
+                <div matLine *ngFor="let rep of changedReps;last as isLast">
+            {{rep.type}} for {{rep.rep.representative?.name}}{{rep.rep.company?.name}} to {{rep.value}}<br *ngIf="!isLast"></div>
+            </mat-list-item>
+        </mat-list>
+        <div style="padding-left: 16px" *ngIf="new.source">
+            Source: {{new.source}}
+        </div>
+        <mat-list-item *ngIf="new.remove_reason">
+            Removal reason: {{new.remove_reason}}
+        </mat-list-item>
+    </mat-card-content>
+
+    <mat-expansion-panel *ngIf="old?.bio != new?.bio">
+        <mat-expansion-panel-header>Bio changed to</mat-expansion-panel-header>
+        <div matLine [innerHTML]="new?.bio"></div>
+    </mat-expansion-panel>
+</mat-card>

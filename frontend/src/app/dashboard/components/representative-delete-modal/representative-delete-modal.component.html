@@ -1,0 +1,18 @@
+<h1 mat-dialog-title>Delete representative?</h1>
+<mat-dialog-content>
+
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-raised-button (click)="onSubmit('block')"
+          class="pull-right">
+    Delete and block
+  </button>
+  <button mat-raised-button (click)="onSubmit('delete')"
+          class="pull-right" cdkFocusInitial>
+    Delete
+  </button>
+  <button mat-raised-button (click)="onSubmit('cancel')"
+          class="pull-right">
+    Cancel
+  </button>
+</mat-dialog-actions>

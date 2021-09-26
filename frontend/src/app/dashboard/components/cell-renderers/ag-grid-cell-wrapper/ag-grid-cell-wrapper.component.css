@@ -1,0 +1,8 @@
+.cell-wrapper {
+    margin-top: 4px;
+    line-height: 40px;
+}
+
+.cell-wrapper.shifted {
+    margin-top: 11px;
+}

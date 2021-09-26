@@ -1,0 +1,48 @@
+<mat-card fxFlexAlign="column">
+    <mat-card-content>
+        <mat-card-title>
+            {{new.user}}
+            on {{new.valid_from|date:'short'}} <span *ngIf="name"> for <b>{{name}}</b></span>
+        </mat-card-title>
+        <mat-list>
+            <mat-list-item *ngIf="old?.last_verify_date != new?.last_verify_date">
+                <div matLine><b>Profile verified</b></div>
+                <div matLine *ngIf="old?.bio != new?.bio"><br></div>
+                <div matLine *ngIf="old?.bio != new?.bio"><br></div>
+            </mat-list-item>
+            <!--@TODO handle price and deceased fields-->
+            <mat-list-item *ngIf="notModified">Saved without any modifications</mat-list-item>
+            <mat-list-item *ngIf="old?.name != new?.name">
+                Name changed from {{old?.name}} to {{new?.name}}
+            </mat-list-item>
+            <mat-list-item *ngIf="old?.description != new?.description">
+                Description changed to {{new?.description}}
+            </mat-list-item>
+
+            <mat-list-item *ngIf="old?.website != new?.website">
+                Website changed to {{new?.website}}
+            </mat-list-item>
+            <mat-list-item *ngIf="old?.instagram != new?.instagram">
+                Instagram changed to {{new?.instagram}}
+            </mat-list-item>
+            <mat-list-item *ngIf="newLocations.length">
+                Added locations:
+                <span *ngFor="let location of newLocations;last as isLast">{{location.name}}<span
+                    *ngIf="!isLast">,</span> </span>
+            </mat-list-item>
+            <mat-list-item *ngIf="removedLocations.length">
+                Removed locations:
+                <span *ngFor="let location of removedLocations;last as isLast">{{location.name}}<span
+                    *ngIf="!isLast">,</span> </span>
+            </mat-list-item>
+            <mat-list-item *ngIf="changedLocations.length">
+                <p matLine>Changed locations:</p>
+                <div matLine *ngFor="let location of changedLocations;last as isLast">
+                    {{location.type}} for {{location.location.name}} to {{location.value}}<br *ngIf="!isLast"></div>
+            </mat-list-item>
+        </mat-list>
+        <div style="padding-left: 16px" *ngIf="new.source">
+            Source: {{new.source}}
+        </div>
+    </mat-card-content>
+</mat-card>

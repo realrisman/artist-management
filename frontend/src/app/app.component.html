@@ -1,0 +1,32 @@
+<div class="main-container" id="main-container">
+    <mat-sidenav-container>
+        <mat-sidenav #sidenav mode="side" [(opened)]="opened">
+            <div class="side-nav">
+                <mat-nav-list>
+                    <a mat-list-item href="" routerLink="/users" [routerLinkActive]="['active']" allowed="ROLE_ADMIN">Users</a>
+                    <a mat-list-item href="" routerLink="/celebrities" [routerLinkActive]="['active']">Celebrities</a>
+                    <a mat-list-item href="" routerLink="/representatives" [routerLinkActive]="['active']"
+                       allowed="ROLE_ADMIN,ROLE_EDITOR">Representatives</a>
+                    <a mat-list-item href="" routerLink="/companies" [routerLinkActive]="['active']"
+                       allowed="ROLE_ADMIN,ROLE_EDITOR">Companies</a>
+                    <a mat-list-item href="" routerLink="/logs" [routerLinkActive]="['active']"
+                       allowed="ROLE_ADMIN,ROLE_EDITOR">Logs</a>
+                </mat-nav-list>
+            </div>
+        </mat-sidenav>
+        <mat-sidenav-content>
+            <mat-toolbar color="primary">
+                <button mat-icon-button (click)="sidenav.toggle()">
+                    <mat-icon>menu</mat-icon>
+                </button>
+                <span>Dashboard</span>
+                <span class="example-fill-remaining-space"></span>
+
+                <span><button mat-raised-button="" (click)="logout()" color="warn">Logout</button> </span>
+            </mat-toolbar>
+            <div class="content">
+                <router-outlet></router-outlet>
+            </div>
+        </mat-sidenav-content>
+    </mat-sidenav-container>
+</div>

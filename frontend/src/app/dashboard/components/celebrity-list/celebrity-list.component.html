@@ -1,0 +1,203 @@
+<div>
+    <a mat-raised-button routerLink="/celebrities/add" allowed="ROLE_ADMIN,ROLE_EDITOR,ROLE_SPOT_CHECKER,ROLE_USER,ROLE_TRAINER">Add Celebrity</a>
+    <button mat-icon-button (click)="setViewType('list')">
+        <mat-icon>list</mat-icon>
+    </button>
+    <button mat-icon-button (click)="setViewType('quick')">
+        <mat-icon>view_list</mat-icon>
+    </button>
+    <button mat-icon-button (click)="setViewType('full')">
+        <mat-icon>view_agenda</mat-icon>
+    </button>
+    <button mat-raised-button (click)="export()" allowed="ROLE_ADMIN,ROLE_EDITOR,ROLE_SPOT_CHECKER">Export</button>
+</div>
+<div fxFlex="row">
+    <mat-form-field fxFlex="17">
+        <input matInput placeholder="Name" value="" type="text" name="name" [(ngModel)]="filter.name"
+               (change)="onFilterChange()">
+    </mat-form-field>
+    <mat-form-field fxFlex="13">
+        <input matInput placeholder="Agent" value="" type="text" name="agent" [matAutocomplete]="agentList"
+               [formControl]="agentAutoComplete">
+        <mat-autocomplete #agentList="matAutocomplete" [displayWith]="displayFn">
+            <mat-option *ngFor="let agent of filtered.agents | async" [value]="agent">
+                {{ agent.name }}
+            </mat-option>
+        </mat-autocomplete>
+    </mat-form-field>
+    <mat-form-field fxFlex="13">
+        <input matInput placeholder="Manager" value="" type="text" name="manager" [matAutocomplete]="managerList"
+               [formControl]="managerAutoComplete">
+        <mat-autocomplete #managerList="matAutocomplete" [displayWith]="displayFn">
+            <mat-option *ngFor="let manager of filtered.managers | async" [value]="manager">
+                {{ manager.name }}
+            </mat-option>
+        </mat-autocomplete>
+    </mat-form-field>
+    <mat-form-field fxFlex="13">
+        <input matInput placeholder="Publicist" value="" type="text" name="publicist"
+               [matAutocomplete]="publicistList" [formControl]="publicistAutoComplete">
+        <mat-autocomplete #publicistList="matAutocomplete" [displayWith]="displayFn">
+            <mat-option *ngFor="let publicist of filtered.publicists | async" [value]="publicist">
+                {{ publicist.name }}
+            </mat-option>
+        </mat-autocomplete>
+    </mat-form-field>
+    <mat-form-field fxFlex="13">
+        <input matInput placeholder="Company" value="" type="text" name="company"
+               [matAutocomplete]="companyList" [formControl]="companyAutoComplete">
+        <mat-autocomplete #companyList="matAutocomplete" [displayWith]="displayCompanyFn">
+            <mat-option *ngFor="let representative of filtered.companies | async" [value]="representative">
+                {{ representative.company }}
+            </mat-option>
+        </mat-autocomplete>
+    </mat-form-field>
+    <mat-form-field fxFlex="8">
+        <mat-select [(value)]="filter.status" placeholder="Status" (change)="onFilterChange()">
+            <mat-option value="draft">Draft</mat-option>
+            <mat-option value="qa">QA</mat-option>
+            <mat-option value="ready">Ready for review</mat-option>
+            <mat-option value="live">Live</mat-option>
+            <mat-option value="deleted">DELETED</mat-option>
+        </mat-select>
+    </mat-form-field>
+    <mat-form-field fxFlex="8">
+        <mat-select [(value)]="filter.sort" placeholder="Sort" (change)="onFilterChange()">
+            <mat-option value="added">Recently added</mat-option>
+            <mat-option value="modified">Recently modified</mat-option>
+            <mat-option value="name">Alphabetical</mat-option>
+            <mat-option value="status">Status</mat-option>
+            <mat-option value="company">Company name</mat-option>
+        </mat-select>
+    </mat-form-field>
+    <mat-form-field fxFlex="7">
+        <mat-select [(value)]="filter.order" placeholder="Order" (change)="onFilterChange()">
+            <mat-option value="asc">Asc</mat-option>
+            <mat-option value="desc">Desc</mat-option>
+        </mat-select>
+    </mat-form-field>
+    <div fxFlex="5" class="mat-form-field">
+        <mat-checkbox [(ngModel)]="filter.noreps" (change)="onFilterChange()">No Reps</mat-checkbox>
+    </div>
+</div>
+<div style="margin-bottom: 10px;">
+    <mat-chip-list>
+        <mat-chip *ngFor="let company of filter.companies;last as isLast">
+            {{company}}
+            <mat-icon (click)="removeCompanyFromFilter(company)">cancel</mat-icon>
+        </mat-chip>
+    </mat-chip-list>
+</div>
+<div style="min-height: 20px;width:100%" [hidden]="!loading">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+</div>
+<div [hidden]="viewType!='list'">
+    <ag-grid-angular
+            class="ag-theme-balham celebrity-list"
+            [rowData]="celebrities"
+            [gridOptions]="gridOptions"
+            [columnDefs]="columnDefs"
+            (rowClicked)="onRowClicked($event)"
+    >
+    </ag-grid-angular>
+</div>
+<div [hidden]="viewType!='quick'">
+    <div fxLayout="row wrap" fxLayoutGap="10px">
+        <mat-card *ngFor="let celebrity of celebrities" fxFlex="24">
+            <mat-card-title>{{celebrity.name}}</mat-card-title>
+            <mat-card-content>
+                <p>Bio: {{celebrity.bio}}</p>
+                <p>Profession: {{celebrity.profession}}</p>
+                <p>Price: {{celebrity.price}}</p>
+                <p>Categories: {{celebrity.categories}}</p>
+                <p>Address: {{celebrity.country}}, {{celebrity.city}} {{celebrity.state}}</p>
+                <p [hidden]="celebrity?.representatives?.agent.length==0"><b>Agents:</b></p>
+                <p *ngFor="let agent of celebrity?.representatives?.agent">{{agent}}</p>
+                <p><b>Managers:</b></p>
+                <p *ngFor="let representative of celebrity?.representatives?.manager">{{representative}}</p>
+                <p [hidden]="celebrity?.representatives?.publicist.length==0"><b>Publicists:</b></p>
+                <p *ngFor="let publicist of celebrity?.representatives?.publicist">{{publicist}}</p>
+            </mat-card-content>
+            <mat-card-actions class="quick-view-actions" align="end">
+                <a mat-raised-button href="{{wp_url}}/?p={{celebrity.wp_id}}">View</a>
+                <a mat-raised-button [routerLink]="['/celebrities',celebrity.id]">Edit</a>
+                <button mat-raised-button>Delete</button>
+                <a mat-raised-button [routerLink]="['/celebrities/log',celebrity.id]">Log</a>
+            </mat-card-actions>
+        </mat-card>
+    </div>
+</div>
+<div [hidden]="viewType!='full'">
+    <div fxLayout="row wrap" fxLayoutGap="10px">
+        <mat-card *ngFor="let celebrity of celebrities" fxFlex="100">
+            <mat-card-title>{{celebrity.name}}</mat-card-title>
+            <mat-card-content fxLayout="row" fxLayoutGap="10px">
+                <div fxFlex="25">
+                    <p>Bio: {{celebrity.bio}}</p>
+                    <p>Profession: {{celebrity.profession}}</p>
+                    <p>Price: {{celebrity.price}}</p>
+                    <p>Categories: {{celebrity.categories}}</p>
+                    <p [hidden]="!celebrity.birthdate">Birthday: {{celebrity.birthday}}</p>
+                    <p>Status: {{celebrity.status}}</p>
+                    <p>Address: {{celebrity.country}}, {{celebrity.city}} {{celebrity.state}}</p>
+                </div>
+                <div fxFlex="24">
+                    <p [hidden]="celebrity?.representatives?.agent.length==0"><b>Agents:</b></p>
+                    <mat-card *ngFor="let representative of celebrity?.representatives?.agent">
+                        <mat-card-content>
+                            <p>Name: {{representative.name}}</p>
+                            <p>Company: {{representative.company}}</p>
+                            <p>Mailing address: {{representative.mailing_address}}</p>
+                            <p>Visitor address: {{representative.visitor_address}}</p>
+                            <p [hidden]="representative?.phones?.length==0">Phones:</p>
+                            <p *ngFor="let phone of representative.phones">{{phone}}</p>
+                            <p [hidden]="representative?.emails?.length==0">E-mails:</p>
+                            <p *ngFor="let email of representative.emails">{{email}}</p>
+                        </mat-card-content>
+                    </mat-card>
+                </div>
+                <div fxFlex="24">
+                    <p><b>Managers:</b></p>
+                    <mat-card *ngFor="let representative of celebrity?.representatives?.manager">
+                        <mat-card-content>
+                            <p>Name: {{representative.name}}</p>
+                            <p>Company: {{representative.company}}</p>
+                            <p>Mailing address: {{representative.mailing_address}}</p>
+                            <p>Visitor address: {{representative.visitor_address}}</p>
+                            <p [hidden]="representative?.phones?.length==0">Phones:</p>
+                            <p *ngFor="let phone of representative.phones">{{phone}}</p>
+                            <p [hidden]="representative?.emails?.length==0">E-mails:</p>
+                            <p *ngFor="let email of representative.emails">{{email}}</p>
+                        </mat-card-content>
+                    </mat-card>
+                </div>
+                <div fxFlex="24">
+                    <p [hidden]="celebrity?.representatives?.publicist.length==0"><b>Publicists:</b></p>
+                    <mat-card *ngFor="let representative of celebrity?.representatives?.publicist">
+                        <mat-card-content>
+                            <p>Name: {{representative.name}}</p>
+                            <p>Company: {{representative.company}}</p>
+                            <p>Mailing address: {{representative.mailing_address}}</p>
+                            <p>Visitor address: {{representative.visitor_address}}</p>
+                            <p [hidden]="representative?.phones?.length==0">Phones:</p>
+                            <p *ngFor="let phone of representative.phones">{{phone}}</p>
+                            <p [hidden]="representative?.emails?.length==0">E-mails:</p>
+                            <p *ngFor="let email of representative.emails">{{email}}</p>
+                        </mat-card-content>
+                    </mat-card>
+                </div>
+            </mat-card-content>
+            <mat-card-actions class="quick-view-actions" align="end">
+                <a mat-raised-button href="{{wp_url}}/?p={{celebrity.wp_id}}">View</a>
+                <a mat-raised-button [routerLink]="['/celebrities',celebrity.id]">Edit</a>
+                <button mat-raised-button>Delete</button>
+                <a mat-raised-button [routerLink]="['/celebrities/log',celebrity.id]">Log</a>
+            </mat-card-actions>
+        </mat-card>
+    </div>
+</div>
+<div>
+    <mat-paginator [length]="total" [pageSize]="filter.limit" (page)="processPageEvent($event)"
+                   showFirstLastButtons="true" [pageSizeOptions]="pageSizeOptions">
+    </mat-paginator>
+</div>

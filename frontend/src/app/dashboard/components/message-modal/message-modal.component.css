@@ -1,0 +1,15 @@
+textarea{
+    width: 100%;
+}
+.fixActionRow {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.spacer {
+    flex-grow: 1;
+}
+.mat-dialog-content {
+    max-height: initial !important;
+}

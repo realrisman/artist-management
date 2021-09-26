@@ -1,0 +1,78 @@
+/* You can add global styles to this file, and also import other style files */
+@import '~@angular/material/prebuilt-themes/deeppurple-amber.css';
+@import "~ag-grid/dist/styles/ag-grid.css";
+@import "~ag-grid/dist/styles/ag-theme-balham.css";
+
+mat-sidenav {
+    width: 200px;
+}
+
+div.side-nav {
+    padding: 10px;
+}
+
+div.content {
+    height: calc(100vh - 128px);
+    padding: 24px;
+}
+
+.user-list {
+    width: 100%;
+    height: calc(100vh - 165px);
+}
+
+.celebrity-list {
+    width: 100%;
+    height: calc(100vh - 285px);
+}
+
+.representative-list {
+    width: 100%;
+    height: calc(100vh - 235px);
+}
+
+.representative-log, .celebrity-log {
+    width: 100%;
+    height: calc(100vh - 185px);
+}
+.celebrity-log-list {
+    width: 100%;
+    height: calc(100vh - 280px);
+}
+
+mat-form-field {
+    max-width: 350px;
+    width: 90%;
+}
+
+.pull-right {
+    float: right;
+}
+
+.loading-spinner {
+    height: 30px;
+    width: 30px;
+    display: inline-block;
+    padding-right: 10px;
+}
+
+.mat-list-item.active {
+    background: rgba(0, 0, 0, .04);
+}
+.ag-theme-balham .ag-cell{
+    line-height: 19px;
+}
+
+
+.mat-tooltip.large{
+    font-size: 16px;
+    white-space: pre-line;
+}
+
+.mat-tooltip.large.phone{
+    max-width: 400px;
+}
+
+.mat-form-field-suffix .mat-icon.field-tooltip{
+    font-size: 100%;
+}

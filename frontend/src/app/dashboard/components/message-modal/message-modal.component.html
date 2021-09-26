@@ -1,0 +1,15 @@
+<div class="fixActionRow">
+    <h1 mat-dialog-title>{{message.type}}</h1>
+    <mat-dialog-content>
+        <p>{{message.text}}</p>
+        <textarea *ngIf="message.details" rows="10" name="details">{{message.details}}</textarea>
+    </mat-dialog-content>
+    <div class="spacer"></div>
+    <mat-dialog-actions>
+        <button mat-raised-button
+                class="pull-right" [mat-dialog-close]="true">
+            Close
+        </button>
+    </mat-dialog-actions>
+
+</div>

@@ -1,0 +1,258 @@
+<div style="min-height: 20px;width:100%" *ngIf="isSaving">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+</div>
+<div style="margin-bottom: 10px;" fxLayout="row" fxLayoutGap="10px">
+    <div style="width: 70px">
+        <a mat-icon-button [routerLink]="['..']">
+            <mat-icon>keyboard_backspace</mat-icon>
+            Back</a>
+    </div>
+        <button mat-raised-button (click)="import()" *ngIf="company.id && (company.status != 'deleted')" [disabled]="isSaving">Import from WP
+        </button>
+        <button mat-raised-button (click)="verify()" *ngIf="company.needs_update_flag && (company.status != 'deleted')"
+                [disabled]="isSaving" allowed="ROLE_ADMIN,ROLE_USER,ROLE_EDITOR,ROLE_SPOT_CHECKER,ROLE_TRAINER">Verify Data</button>
+</div>
+<div fxLayout="row">
+    <form class="form" #saveForm="ngForm" (ngSubmit)="onSubmit($event)" name="representative-form-data" fxLayout="row"
+          fxFill fxLayoutGap="20px">
+        <div fxFlex="30" fxLayout="column">
+            <mat-form-field style="width: 100%">
+                <input matInput placeholder="Name" value="" type="text" [(ngModel)]="company.name" name="name"
+                       [disabled]="isSaving" required
+                >
+                <mat-icon class="field-tooltip" matSuffix matTooltip="Full Company Name" matTooltipClass="large" matTooltipPosition="right">help</mat-icon>
+            </mat-form-field>
+            <div *ngIf="company.primaryCategory" class="primary-category"
+                 allowed="ROLE_ADMIN,ROLE_USER,ROLE_EDITOR,ROLE_SPOT_CHECKER,ROLE_TRAINER">
+                <span class="primary-category-label">Primary category:</span> {{company.primaryCategory.name}}
+            </div>
+            <mat-form-field style="width: 100%">
+                <mat-select name="categories" #categoriesSelect [(ngModel)]="company.categories" multiple
+                            (selectionChange)="categoryChanged($event)"
+                            [compareWith]="categoryCompareFn">
+                    <mat-option *ngFor="let category of categories" [value]="category"
+                                [ngClass]="{shifted:category.parent}">
+                        {{category.name}}
+                        <a class="primary-category-link" href="" (click)="primaryClick(category,$event)">
+                            <span></span>
+                        </a>
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field>
+                        <textarea matInput placeholder="Description "
+                                  [(ngModel)]="company.description" name="description"
+                                  [disabled]="isSaving" rows="6" style="width: 100%"></textarea>
+            </mat-form-field>
+            <mat-form-field style="width: 100%">
+                <input matInput placeholder="Website" value="" type="text" [(ngModel)]="company.website" name="website"
+                       [disabled]="isSaving"
+                >
+                <mat-icon class="field-tooltip" matSuffix matTooltip="www.example.com" matTooltipClass="large" matTooltipPosition="right">help</mat-icon>
+            </mat-form-field>
+            <mat-form-field style="width: 100%">
+                <input matInput placeholder="Instagram" value="" type="text" [(ngModel)]="company.instagram" name="instagram"
+                       [disabled]="isSaving"
+                >
+                <mat-icon class="field-tooltip" matSuffix matTooltip="Instagram Handle only" matTooltipClass="large" matTooltipPosition="right">help</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field allowed="ROLE_ADMIN,ROLE_USER,ROLE_EDITOR,ROLE_SPOT_CHECKER">
+                <mat-select [(ngModel)]="company.status" placeholder="Status" required=""
+                            name="status" #status="ngModel"
+                            [disabled]="isSaving || (status.pristine && company.status=='deleted')">
+                    <mat-option value="draft"
+                                *ngIf="!company.status || company.status=='draft' || !company.id">
+                        Draft
+                    </mat-option>
+                    <mat-option value="draft">Draft</mat-option>
+                    <mat-option value="qa">QA</mat-option>
+                    <mat-option value="live">Live</mat-option>
+                    <mat-option value="deleted">DELETED</mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field allowed="ROLE_TRAINER">
+                <mat-select [(ngModel)]="company.status" placeholder="Status" [disabled]="isSaving" required="required"
+                            name="status" empty="true">
+                    <mat-option value="draft" *ngIf="!company.status || company.status=='draft' || !company.id">
+                        Draft
+                    </mat-option>
+                    <mat-option value="ready">Ready for review</mat-option>
+                    <mat-option value="qa">QA</mat-option>
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field allowed="ROLE_ADMIN,ROLE_USER,ROLE_EDITOR,ROLE_SPOT_CHECKER,ROLE_TRAINER,ROLE_IMAGE_UPLOADER">
+                <textarea matInput placeholder="Source" value="" type="text" [(ngModel)]="company.source"
+                          name="source"
+                          [disabled]="isSaving"></textarea>
+            </mat-form-field>
+            <div>
+                <button mat-raised-button (click)="save(false)" [disabled]="!saveForm.form.valid || isSaving"
+                        type="submit"
+                        color="primary">
+                    Save
+                </button>
+                                <button mat-raised-button (click)="save(true)" [disabled]="!saveForm.form.valid || isSaving"
+                                        type="submit"
+                                        color="primary">
+                                    Save &amp; Verify
+                                </button>
+                <div [hidden]="!savedOk">Saved successfully!</div>
+            </div>
+        </div>
+        <div fxFlex="70">
+            <div style="width: 80%;margin-bottom: 20px;" *ngIf="company.image">
+                <img [src]="company.image" style="max-width: 400px">
+            </div>
+            <div style="width: 80%;margin-bottom: 20px;">
+                <input type="file" name="featured_image" (change)="fileChange($event)">
+            </div>
+            <mat-form-field>
+                <input matInput placeholder="Image title" value="" type="text" [(ngModel)]="company.image_title"
+                       name="image_title"
+                       [disabled]="isSaving">
+            </mat-form-field>
+            <mat-form-field>
+                <input matInput placeholder="Image alt" value="" type="text" [(ngModel)]="company.image_alt"
+                       name="image_alt"
+                       [disabled]="isSaving">
+            </mat-form-field>
+            <div>
+                <p>Locations:
+                    <button mat-icon-button (click)="addLocation()" color="primary">
+                        <mat-icon>add</mat-icon>
+                    </button>
+                </p>
+                <div fxLayout="column" fxLayoutGap="20px">
+                    <mat-card *ngFor="let location of company.locations;index as i;trackBy:trackByFn" fxFlex="90">
+                        <div fxLayout="row" fxLayoutGap="10px">
+                            <mat-form-field fxFlex="30">
+                                <input matInput placeholder="Name" value="" type="text"
+                                       [(ngModel)]="company.locations[i].name"
+                                       name="location_name_{{i}}"
+                                       [disabled]="isSaving" required>
+                                <mat-icon class="field-tooltip" matSuffix matTooltip="City" matTooltipClass="large" matTooltipPosition="above">help</mat-icon>
+                            </mat-form-field>
+                            <mat-form-field fxFlex="30">
+                                <input matInput placeholder="Phone" value="" type="text"
+                                       [(ngModel)]="company.locations[i].phone"
+                                       name="location_phone_{{i}}"
+                                       [disabled]="isSaving">
+                                <mat-icon class="field-tooltip" matSuffix matTooltip="+ country code  8 digits (4-4);  +47 1111-2222
++ country code  9 digits (3-3-3); +33 111-222-333
++ country code  10 digits (3-3-4); +1 111-222-3333
++ country code  11 digits (3-4-4) +49 111-2222-3333" matTooltipClass="large phone" matTooltipPosition="above">help</mat-icon>
+                            </mat-form-field>
+                            <mat-form-field fxFlex="30">
+                                <input matInput placeholder="E-mail" value="" type="text"
+                                       [(ngModel)]="company.locations[i].email"
+                                       name="location_email_{{i}}"
+                                       [disabled]="isSaving">
+                                <mat-icon class="field-tooltip" matSuffix matTooltip="gmail@gmail.com (without capital letters)" matTooltipClass="large" matTooltipPosition="above">help</mat-icon>
+                            </mat-form-field>
+                            <div fxFlex>
+                                <button mat-raised-button (click)="checkEmail(company.locations[i].email, i)" [disabled]="isChecking[i]" type="submit"
+                                        allowed="ROLE_ADMIN,ROLE_USER,ROLE_EDITOR,ROLE_TRAINER,ROLE_WRITER,ROLE_SPOT_CHECKER" color="primary">
+                                    Check
+                                </button>
+                                <mat-icon color="warn" *ngIf="checkEmailFail[i]">error</mat-icon>
+                                <mat-icon color="primary" *ngIf="checkEmailSuccess[i]">done</mat-icon>
+                                <mat-icon color="primary" *ngIf="checkEmailUnknown[i]">help</mat-icon>
+                            </div>
+                        </div>
+                        <div fxLayout="row" fxLayoutGap="10px">
+                            <mat-form-field fxFlex="30">
+                                <textarea matInput placeholder="Mailing address"
+                                          [(ngModel)]="company.locations[i].postal_address" name="location_postal_address_{{i}}"
+                                          [disabled]="isSaving" rows="6" style="width: 100%"
+                                ></textarea>
+                                <mat-icon class="field-tooltip" matSuffix matTooltip="Company Name - City
+                      Street
+                      Floor/Suite/Apartment/Building
+                City, State ZIP Code
+                Country" matTooltipClass="large" matTooltipPosition="below">help</mat-icon>
+                            </mat-form-field>
+
+                            <mat-form-field fxFlex="30">
+                                <textarea matInput placeholder="Visitor address"
+                                          [(ngModel)]="company.locations[i].visitor_address"
+                                          name="location_visitor_address_{{i}}"
+                                          [disabled]="isSaving" rows="6" style="width: 100%"
+                                ></textarea>
+                                <mat-icon class="field-tooltip" matSuffix matTooltip="City, State
+                Country" matTooltipClass="large" matTooltipPosition="below">help</mat-icon>
+                            </mat-form-field>
+                            <div fxFlex="2" style="padding-top:8px;">
+                                <button mat-mini-fab (click)="removeLocation(i)" color="warn">
+                                    <mat-icon>remove</mat-icon>
+                                </button>
+                            </div>
+                        </div>
+                    </mat-card>
+                </div>
+            </div>
+            <div>
+                <p>Celebrity connections:
+                </p>
+                <mat-list dense>
+                    <mat-list-item *ngFor="let celebrity of company.celebrities">
+                        <div fxFlex="50">
+                            <b>{{celebrity.celebrity}}</b> created on {{celebrity.created}} verified on {{celebrity.verifiedDate|date:'shortDate'}}: <code>{{celebrity.verifyRank}}</code>
+                        </div>
+                        <div fxFlex="20">
+                            <button mat-mini-fab (click)="removeConnection(celebrity.rc_id)" color="warn">
+                                <mat-icon>remove</mat-icon>
+                            </button>
+                            <mat-checkbox [disabled]="!celebrity.rc_id" [(ngModel)]="celebrity.verify" name="verifiedConnections[{{celebrity.rc_id}}]">
+                            </mat-checkbox>
+                        </div>
+                    </mat-list-item>
+                </mat-list>
+                <p>
+
+                </p>
+            </div>
+            <div>
+                <p>Represenatives:
+                </p>
+                <mat-list dense>
+                    <mat-list-item *ngFor="let representative of company.representatives">
+                        <div fxFlex="50">
+                            <b><a [routerLink]="['/representatives',representative.id]" [queryParams]="{from:'list'}">{{representative.name}}</a></b> <span *ngIf="representative.locationName">{{representative.locationName}}</span>
+                        </div>
+                    </mat-list-item>
+                </mat-list>
+                <p>
+
+                </p>
+            </div>
+            <div *ngIf="company.sources" style="width: 80%; margin-top:20px;" allowed="ROLE_ADMIN,ROLE_USER,ROLE_EDITOR,ROLE_SPOT_CHECKER,ROLE_TRAINER">
+                <mat-expansion-panel>
+                    <mat-expansion-panel-header>Sources</mat-expansion-panel-header>
+                    <ul>
+                        <li *ngFor="let source of company.sources">
+                            <i>{{source.author}}</i>&nbsp;on {{source.date|date:'short'}}:
+                            <pre class="source">{{source.source}}</pre>
+                        </li>
+                    </ul>
+                </mat-expansion-panel>
+            </div>
+            <div *ngIf="company.verification_log.length" style="width: 80%; margin-top:20px;" allowed="ROLE_ADMIN,ROLE_USER,ROLE_EDITOR,ROLE_SPOT_CHECKER,ROLE_TRAINER">
+                <mat-expansion-panel>
+                    <mat-expansion-panel-header>Verification Log</mat-expansion-panel-header>
+                    <mat-list dense>
+                        <mat-list-item *ngFor="let entry of company.verification_log">
+                            <i>{{entry.login}}</i>&nbsp;on {{entry.date|date:'shortDate'}}
+                        </mat-list-item>
+                    </mat-list>
+                </mat-expansion-panel>
+            </div>
+            <div style="width: 80%; margin-top:20px;" allowed="ROLE_ADMIN,ROLE_USER,ROLE_EDITOR,ROLE_SPOT_CHECKER,ROLE_TRAINER">
+                <mat-expansion-panel>
+                    <mat-expansion-panel-header>Log</mat-expansion-panel-header>
+                    <app-company-log></app-company-log>
+                </mat-expansion-panel>
+            </div>
+        </div>
+    </form>
+</div>

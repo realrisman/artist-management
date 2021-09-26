@@ -1,0 +1,21 @@
+<div fxLayout="column">
+    <div>
+        <form class="form" #saveForm="ngForm" (ngSubmit)="onSubmit($event)" name="login-form-data">
+            <mat-form-field>
+                <input matInput placeholder="Login" value="" type="text" [(ngModel)]="login" name="login">
+            </mat-form-field>
+            <mat-form-field>
+                <input matInput placeholder="Password" value="" type="password" [(ngModel)]="password" name="password">
+            </mat-form-field>
+
+            <div class="button-group">
+                <button mat-button [disabled]="!saveForm.form.valid || isSaving" (click)="onSubmit($event)"
+                        class="pull-right">
+                    <mat-spinner *ngIf="isSaving" mode="indeterminate" color="primary"
+                                class="loading-spinner"></mat-spinner>
+                    Login
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
