@@ -11,7 +11,6 @@ use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 
 class LoginController extends AbstractController
 {
-
     /**
      * @Route("/login", name="login_get", methods={"GET","HEAD"})
      */
@@ -37,9 +36,9 @@ class LoginController extends AbstractController
             $data = json_decode($request->getContent(), true);
         }
 
-        if (isset($data['username']) && isset($data['password'])) {
+        if (isset($data['login']) && isset($data['password'])) {
             try {
-                $user  = $userService->login($data['username'], $data['password']);
+                $user  = $userService->login($data['login'], $data['password']);
                 $token = new UsernamePasswordToken($user, null, 'main', $user->getRoles());
                 $this->get('security.token_storage')->setToken($token);
 
