@@ -47,6 +47,51 @@ class User implements UserInterface, \Serializable
      */
     private $deleted = false;
 
+    /**
+     * @ORM\OneToMany(targetEntity="Representative", mappedBy="user")
+     */
+    private $agents;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Celebrity", mappedBy="user")
+     */
+    private $celebrities;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Company", mappedBy="user")
+     */
+    private $companies;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\RepresentativeLog", mappedBy="user")
+     */
+    private $representativeLogs;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\CelebrityLog", mappedBy="user")
+     */
+    private $celebrityLogs;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\CompanyLog", mappedBy="user")
+     */
+    private $companyLogs;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\UniqueLink", mappedBy="user")
+     */
+    private $uniqueLinks;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\UniqueLinkCelebrity", mappedBy="user", orphanRemoval=true)
+     */
+    private $uniqueLinkCelebrities;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\UniqueLinkCompany", mappedBy="user", orphanRemoval=true)
+     */
+    private $uniqueLinkCompanies;
+
     public function __construct()
     {
         $this->celebrities = new ArrayCollection();
@@ -92,6 +137,68 @@ class User implements UserInterface, \Serializable
             throw new \Exception('Unknown user role');
         }
         $this->role = $role;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Representative[]
+     */
+    public function getAgents(): Collection
+    {
+        return $this->agents;
+    }
+
+    public function addAgent(Representative $agent): self
+    {
+        if (!$this->agents->contains($agent)) {
+            $this->agents[] = $agent;
+            $agent->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAgent(Representative $agent): self
+    {
+        if ($this->agents->contains($agent)) {
+            $this->agents->removeElement($agent);
+            // set the owning side to null (unless already changed)
+            if ($agent->getUser() === $this) {
+                $agent->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Celebrity[]
+     */
+    public function getCelebrities(): Collection
+    {
+        return $this->celebrities;
+    }
+
+    public function addCelebrity(Celebrity $celebrity): self
+    {
+        if (!$this->celebrities->contains($celebrity)) {
+            $this->celebrities[] = $celebrity;
+            $celebrity->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCelebrity(Celebrity $celebrity): self
+    {
+        if ($this->celebrities->contains($celebrity)) {
+            $this->celebrities->removeElement($celebrity);
+            // set the owning side to null (unless already changed)
+            if ($celebrity->getUser() === $this) {
+                $celebrity->setUser(null);
+            }
+        }
 
         return $this;
     }
@@ -190,5 +297,192 @@ class User implements UserInterface, \Serializable
     public function eraseCredentials()
     {
         // TODO: Implement eraseCredentials() method.
+    }
+
+    /**
+     * @return Collection|RepresentativeLog[]
+     */
+    public function getRepresentativeLogs(): Collection
+    {
+        return $this->representativeLogs;
+    }
+
+    public function addRepresentativeLog(RepresentativeLog $representativeLog): self
+    {
+        if (!$this->representativeLogs->contains($representativeLog)) {
+            $this->representativeLogs[] = $representativeLog;
+            $representativeLog->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeRepresentativeLog(RepresentativeLog $representativeLog): self
+    {
+        if ($this->representativeLogs->contains($representativeLog)) {
+            $this->representativeLogs->removeElement($representativeLog);
+            // set the owning side to null (unless already changed)
+            if ($representativeLog->getUser() === $this) {
+                $representativeLog->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|CelebrityLog[]
+     */
+    public function getCelebrityLogs(): Collection
+    {
+        return $this->celebrityLogs;
+    }
+
+    public function addCelebrityLog(CelebrityLog $celebrityLog): self
+    {
+        if (!$this->celebrityLogs->contains($celebrityLog)) {
+            $this->celebrityLogs[] = $celebrityLog;
+            $celebrityLog->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCelebrityLog(CelebrityLog $celebrityLog): self
+    {
+        if ($this->celebrityLogs->contains($celebrityLog)) {
+            $this->celebrityLogs->removeElement($celebrityLog);
+            // set the owning side to null (unless already changed)
+            if ($celebrityLog->getUser() === $this) {
+                $celebrityLog->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCompanies()
+    {
+        return $this->companies;
+    }
+
+    /**
+     * @param mixed $companies
+     */
+    public function setCompanies($companies): void
+    {
+        $this->companies = $companies;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCompanyLogs()
+    {
+        return $this->companyLogs;
+    }
+
+    /**
+     * @param mixed $companyLogs
+     */
+    public function setCompanyLogs($companyLogs): void
+    {
+        $this->companyLogs = $companyLogs;
+    }
+
+    /**
+     * @return Collection|UniqueLink[]
+     */
+    public function getUniqueLinks(): Collection
+    {
+        return $this->uniqueLinks;
+    }
+
+    public function addUniqueLink(UniqueLink $uniqueLink): self
+    {
+        if (!$this->uniqueLinks->contains($uniqueLink)) {
+            $this->uniqueLinks[] = $uniqueLink;
+            $uniqueLink->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUniqueLink(UniqueLink $uniqueLink): self
+    {
+        if ($this->uniqueLinks->contains($uniqueLink)) {
+            $this->uniqueLinks->removeElement($uniqueLink);
+            // set the owning side to null (unless already changed)
+            if ($uniqueLink->getUser() === $this) {
+                $uniqueLink->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|UniqueLinkCelebrity[]
+     */
+    public function getUniqueLinkCelebrities(): Collection
+    {
+        return $this->uniqueLinkCelebrities;
+    }
+
+    public function addUniqueLinkCelebrity(UniqueLinkCelebrity $uniqueLinkCelebrity): self
+    {
+        if (!$this->uniqueLinkCelebrities->contains($uniqueLinkCelebrity)) {
+            $this->uniqueLinkCelebrities[] = $uniqueLinkCelebrity;
+            $uniqueLinkCelebrity->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUniqueLinkCelebrity(UniqueLinkCelebrity $uniqueLinkCelebrity): self
+    {
+        if ($this->uniqueLinkCelebrities->contains($uniqueLinkCelebrity)) {
+            $this->uniqueLinkCelebrities->removeElement($uniqueLinkCelebrity);
+            // set the owning side to null (unless already changed)
+            if ($uniqueLinkCelebrity->getUser() === $this) {
+                $uniqueLinkCelebrity->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|UniqueLinkCompany[]
+     */
+    public function getUniqueLinkCompanies(): Collection
+    {
+        return $this->uniqueLinkCompanies;
+    }
+
+    public function addUniqueLinkCompany(UniqueLinkCompany $uniqueLinkCompany): self
+    {
+        if (!$this->uniqueLinkCompanies->contains($uniqueLinkCompany)) {
+            $this->uniqueLinkCompanies[] = $uniqueLinkCompany;
+            $uniqueLinkCompany->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUniqueLinkCompany(UniqueLinkCompany $uniqueLinkCompany): self
+    {
+        if ($this->uniqueLinkCompanies->contains($uniqueLinkCompany)) {
+            $this->uniqueLinkCompanies->removeElement($uniqueLinkCompany);
+            // set the owning side to null (unless already changed)
+            if ($uniqueLinkCompany->getUser() === $this) {
+                $uniqueLinkCompany->setUser(null);
+            }
+        }
+
+        return $this;
     }
 }
