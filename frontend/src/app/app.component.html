@@ -6,11 +6,11 @@
                     <a mat-list-item href="" routerLink="/users" [routerLinkActive]="['active']" allowed="ROLE_ADMIN">Users</a>
                     <a mat-list-item href="" routerLink="/celebrities" [routerLinkActive]="['active']">Celebrities</a>
                     <a mat-list-item href="" routerLink="/representatives" [routerLinkActive]="['active']"
-                       allowed="ROLE_ADMIN,ROLE_EDITOR">Representatives</a>
+                       allowed="ROLE_ADMIN,ROLE_EDITOR,ROLE_SPOT_CHECKER,ROLE_SPECTATOR,ROLE_TRAINER">Representatives</a>
                     <a mat-list-item href="" routerLink="/companies" [routerLinkActive]="['active']"
-                       allowed="ROLE_ADMIN,ROLE_EDITOR">Companies</a>
+                       allowed="ROLE_USER,ROLE_ADMIN,ROLE_EDITOR,ROLE_SPOT_CHECKER,ROLE_TRAINER">Companies</a>
                     <a mat-list-item href="" routerLink="/logs" [routerLinkActive]="['active']"
-                       allowed="ROLE_ADMIN,ROLE_EDITOR">Logs</a>
+                       allowed="ROLE_USER,ROLE_ADMIN,ROLE_EDITOR,ROLE_SPOT_CHECKER,ROLE_TRAINER">Logs</a>
                 </mat-nav-list>
             </div>
         </mat-sidenav>
