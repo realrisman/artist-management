@@ -33,7 +33,7 @@ class CreateUserCommand extends Command
             // the full command description shown when running the command with
             // the "--help" option
             ->setHelp('This command allows you to create a user...')
-            ->addArgument('username', InputArgument::REQUIRED, 'The username of the user');
+            ->addArgument('username', InputArgument::REQUIRED, 'The username for login');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

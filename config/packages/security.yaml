@@ -1,26 +1,45 @@
 security:
-    # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
-    encoders:
-        App\Entity\User:
-            algorithm: bcrypt
-    providers:
-        users_in_memory: { memory: null }
-    firewalls:
-        dev:
-            pattern: ^/(_(profiler|wdt)|css|images|js)/
-            security: false
-        main:
-            anonymous: lazy
-            provider: users_in_memory
+  access_denied_url: /403
+  # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
+  encoders:
+    App\Entity\User:
+      algorithm: bcrypt
+  providers:
+    in_memory:
+      memory:
+        users:
+          api: { password: Apipass2@21 }
 
-            # activate different ways to authenticate
-            # https://symfony.com/doc/current/security.html#firewalls-authentication
+    db_provider:
+      entity:
+        class: App\Entity\User
+        property: login
 
-            # https://symfony.com/doc/current/security/impersonating_user.html
-            # switch_user: true
+  role_hierarchy:
+    ROLE_IMAGE_UPLOADER: ROLE_SPECTATOR
+    ROLE_WRITER: ROLE_IMAGE_UPLOADER
+    ROLE_TRAINER: ROLE_WRITER
+    ROLE_USER: ROLE_TRAINER
+    ROLE_EDITOR: ROLE_USER
+    ROLE_SPOT_CHECKER: ROLE_EDITOR
+    ROLE_ADMIN: ROLE_EDITOR
 
-    # Easy way to control access for large sections of your site
-    # Note: Only the *first* access control that matches will be used
-    access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+  firewalls:
+    dev:
+      pattern: ^/(_(profiler|wdt)|css|images|js)/
+      security: false
+    #        login:
+    #            pattern: ^/login
+    #            security: false
+    api:
+      pattern: ^/api/
+      anonymous: true
+      provider: in_memory
+    main:
+      pattern: ^/
+      anonymous: true
+      # @see https://stackoverflow.com/questions/17428987/what-is-the-best-way-to-notify-a-user-after-an-access-control-rule-redirects/17432089#17432089
+      entry_point: App\Security\AccessDeniedHandler
+      # @see https://symfony.com/doc/current/security/access_denied_handler.html
+      access_denied_handler: App\Security\AccessDeniedHandler
+      provider: db_provider

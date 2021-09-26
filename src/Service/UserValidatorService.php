@@ -22,8 +22,8 @@ class UserValidatorService
         $this->constraints = [
             new Assert\Collection([
                 'fields'           => [
-                    'username' => new Assert\NotBlank(),
-                    'role'  => new Assert\Choice(array('ROLE_ADMIN', 'ROLE_EDITOR')),
+                    'login' => new Assert\NotBlank(),
+                    'role'  => new Assert\Choice(array('ROLE_EDITOR', 'ROLE_SPOT_CHECKER', 'ROLE_SPECTATOR', 'ROLE_ADMIN', 'ROLE_WRITER', 'ROLE_TRAINER', 'ROLE_IMAGE_UPLOADER')),
                 ],
                 'allowExtraFields' => true
             ]),

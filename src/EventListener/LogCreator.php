@@ -3,6 +3,7 @@
 namespace App\EventListener;
 
 use Doctrine\Common\EventSubscriber;
+use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 
 
@@ -21,6 +22,14 @@ class LogCreator implements EventSubscriber
             'onFlush',
             'postFlush'
         );
+    }
+
+    /**
+     * @param OnFlushEventArgs $eventArgs
+     * @throws \Doctrine\ORM\ORMException
+     */
+    public function onFlush(OnFlushEventArgs $eventArgs)
+    {
     }
 
     /**

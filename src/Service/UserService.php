@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -38,26 +39,29 @@ class UserService
     }
 
 
-    public function createUser($username, $password, $role)
+    public function createUser($login, $password, $role, $first_name = '', $last_name = '')
     {
         $user = new User();
 
         $user->setActive(1);
-        $user->setUsername($username);
+        $user->setLogin($login);
         $user->setPassword($this->encoder->encodePassword($user, $password));
         $user->setRole($role);
 
+        if (!empty($first_name)) {
+            $user->setFirstName($first_name);
+        }
+        if (!empty($last_name)) {
+            $user->setLastName($last_name);
+        }
+        // tell Doctrine you want to (eventually) save the Product (no queries yet)
         $this->manager->persist($user);
+
+        // actually executes the queries (i.e. the INSERT query)
         $this->manager->flush();
     }
 
-    public function updateUser($username, $password = '', $role)
-    {
-        $user = $this->findUserByUsername($username);
-        $this->updateUserData($user, $username, $password, $role);
-    }
-
-    public function updateUserById($id, $username, $password = '', $role, $deleted = false)
+    public function updateUserById($id, $login, $password = '', $role, $first_name = '', $last_name = '', $deleted = false, $monthlyLimit, $limitUsed)
     {
         $user = $this->repository->find($id);
 
@@ -65,17 +69,17 @@ class UserService
             throw new \Exception('User not found');
         }
 
-        $this->updateUserData($user, $username, $password, $role, $deleted);
+        $this->updateUserData($user, $login, $password, $role, $first_name, $last_name, $deleted, $monthlyLimit, $limitUsed);
     }
 
-    public function findUserByUsername($username)
+    public function findUserByLogin($login)
     {
-        return $this->repository->findOneBy(['username' => $username]);
+        return $this->repository->findOneBy(['login' => $login]);
     }
 
-    public function login($username, $password)
+    public function login($login, $password)
     {
-        $user = $this->findUserByUsername($username);
+        $user = $this->findUserByLogin($login);
         if (!$user) {
             throw new \Exception('User not found');
         }
@@ -100,19 +104,32 @@ class UserService
      * @param $login
      * @param $password
      * @param $role
+     * @param string $first_name
+     * @param string $last_name
      * @param bool $deleted
      * @throws \Exception
      */
-    protected function updateUserData(User $user, $username, $password, $role, $deleted = false): void
+    protected function updateUserData(User $user, $login, $password, $role, $first_name = '', $last_name = '', $deleted = false, $monthlyLimit, $limitUsed): void
     {
         if ($password) {
             $user->setPassword($this->encoder->encodePassword($user, $password));
         }
         $user->setRole($role);
-        $user->setUsername($username);
+        $user->setLogin($login);
         $user->setDeleted($deleted);
+        if (!empty($first_name)) {
+            $user->setFirstName($first_name);
+        }
+        if (!empty($last_name)) {
+            $user->setLastName($last_name);
+        }
+        $user->setMonthlyLimit($monthlyLimit);
+        $user->setLimitUsed($limitUsed);
 
+        // tell Doctrine you want to (eventually) save User
         $this->manager->persist($user);
+
+        // actually executes the queries (i.e. the INSERT query)
         $this->manager->flush();
     }
 }
